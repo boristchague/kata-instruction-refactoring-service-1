@@ -4,6 +4,7 @@ import com.newlight77.kata.survey.client.CampaignClient;
 import com.newlight77.kata.survey.model.Campaign;
 import com.newlight77.kata.survey.model.Survey;
 import com.newlight77.kata.survey.util.JsonUtil;
+import com.newlight77.kata.survey.utils.SaveToExcelFileService;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,6 +28,9 @@ public class ExportCampaignServiceTest {
     @Captor
     private ArgumentCaptor<Survey> surveyCaptor;
 
+    @Mock
+    private SaveToExcelFileService saveToExcelFileService;
+
     @Captor
     private ArgumentCaptor<Workbook> workBookCaptor;
 
@@ -34,12 +38,12 @@ public class ExportCampaignServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
 
-        service = new ExportCampaignService(campaignClientMock, mailServiceMock);
+        service = new ExportCampaignService(campaignClientMock, mailServiceMock, saveToExcelFileService);
         service = Mockito.spy(service);
     }
 
     @Test
-    public void test() {
+    public void store_campagn_to_excelFile_test() {
 
         // Arrange
         String surveyJson = "{\n" +
@@ -99,7 +103,7 @@ public class ExportCampaignServiceTest {
         service.sendResults(campaign, survey);
 
         // Assert
-        Mockito.verify(service).writeFileAndSend(surveyCaptor.capture(), workBookCaptor.capture());
+        Mockito.verify(saveToExcelFileService).writeFileAndSend(surveyCaptor.capture(), workBookCaptor.capture());
 
         Workbook workbook = workBookCaptor.getValue();
 
